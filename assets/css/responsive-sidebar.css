@@ -1,0 +1,37 @@
+/* Responsive Sidebar Styles */
+
+/* On small screens, make the sidebar full width when expanded */
+@media (max-width: 767.98px) {
+  #sidebarMenu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    width: 80%;
+    height: 100vh;
+    overflow-y: auto;
+    transition: all 0.3s ease-in-out;
+  }
+
+  /* Ensure the toggle button is visible and properly styled */
+  .navbar-toggler {
+    display: block;
+    margin-right: 10px;
+  }
+
+  /* Adjust content when sidebar is shown */
+  .sidebar-active .content-wrapper {
+    margin-left: 0;
+  }
+
+  /* Ensure the sidebar is hidden by default on mobile */
+  .sidebar {
+    padding-top: 60px; /* Space for the navbar */
+  }
+
+  /* Smooth transition for sidebar */
+  #sidebarMenu {
+    transition: all 0.3s ease-in-out;
+  }
+}

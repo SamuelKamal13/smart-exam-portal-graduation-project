@@ -1,0 +1,142 @@
+/* AI Chat Styles */
+.chat-container {
+  height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f8f9fc;
+  border-radius: 5px;
+  border: 1px solid #e3e6f0;
+  scrollbar-width: thin;
+}
+
+.chat-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.chat-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.user-message,
+.ai-message {
+  max-width: 85%;
+  margin-bottom: 15px;
+  clear: both;
+}
+
+.user-message {
+  float: right;
+}
+
+.ai-message {
+  float: left;
+}
+
+.user-message .font-weight-bold,
+.ai-message .font-weight-bold {
+  margin-bottom: 5px;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.user-message .font-weight-bold {
+  text-align: right;
+}
+
+.user-message > div:last-child {
+  background-color: #4e73df !important;
+  color: white;
+  border-radius: 15px 15px 0 15px;
+  padding: 10px 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.ai-message > div:last-child {
+  background-color: white !important;
+  color: #333;
+  border-radius: 15px 15px 15px 0;
+  padding: 10px 15px;
+  border: 1px solid #e3e6f0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.chat-form-container {
+  position: relative;
+  margin-top: 10px;
+}
+
+.chat-textarea {
+  border-radius: 20px;
+  padding: 12px 60px 12px 20px;
+  resize: none;
+  border: 1px solid #d1d3e2;
+  transition: border-color 0.3s;
+}
+
+.chat-textarea:focus {
+  border-color: #4e73df;
+  box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+.send-button {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background-color: #4e73df;
+  border-color: #4e73df;
+  transition: background-color 0.3s;
+}
+
+.send-button:hover {
+  background-color: #2e59d9;
+  border-color: #2e59d9;
+}
+
+.send-button i {
+  font-size: 16px;
+}
+
+.chat-header {
+  background: linear-gradient(to right, #4e73df, #36b9cc);
+  color: white;
+  border-radius: 5px 5px 0 0;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.chat-header i {
+  margin-right: 10px;
+  font-size: 1.5rem;
+}
+
+.chat-header h6 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* Clear fix for floating messages */
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}

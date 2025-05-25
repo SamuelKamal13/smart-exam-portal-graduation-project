@@ -1,0 +1,18 @@
+# Custom error pages
+ErrorDocument 404 /dashboard/SmartExamPortal/errors/404.php
+ErrorDocument 403 /dashboard/SmartExamPortal/errors/403.php
+ErrorDocument 500 /dashboard/SmartExamPortal/errors/500.php
+
+# PHP error handling
+php_flag display_errors off
+php_value error_reporting E_ALL
+
+# Prevent directory listing
+Options -Indexes
+
+# Handle other errors with the general error page
+ErrorDocument 400 /dashboard/SmartExamPortal/errors/general.php?code=400&message=Bad%20Request
+ErrorDocument 401 /dashboard/SmartExamPortal/errors/general.php?code=401&message=Unauthorized
+ErrorDocument 405 /dashboard/SmartExamPortal/errors/general.php?code=405&message=Method%20Not%20Allowed
+ErrorDocument 408 /dashboard/SmartExamPortal/errors/general.php?code=408&message=Request%20Timeout
+ErrorDocument 502 /dashboard/SmartExamPortal/errors/general.php?code=502&message=Bad%20Gateway
