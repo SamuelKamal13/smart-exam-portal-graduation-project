@@ -114,6 +114,18 @@
             </li>
         <?php endif; ?>
     </ul>
+
+    <!-- Contact Us Link - Available to all users -->
+    <hr>
+    <ul class="nav nav-pills flex-column">
+        <li>
+            <a href="<?php echo isset($base_url) ? $base_url : ""; ?>/contact.php" class="nav-link text-white <?php echo (strpos($_SERVER['REQUEST_URI'], '/contact.php') !== false) ? 'active' : ''; ?>">
+                <i class="fas fa-envelope me-2"></i>
+                Contact Us
+            </a>
+        </li>
+    </ul>
+
     <hr>
     <div class="dropdown">
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">

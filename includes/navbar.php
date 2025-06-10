@@ -8,6 +8,7 @@
             <span class="fs-4">Smart Exam Portal</span>
         </a>
 
+
         <div class="navbar-nav ms-auto">
             <div class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -29,6 +30,11 @@
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item" href="<?php echo isset($base_url) ? $base_url : ""; ?>/profile.php"><i class="fas fa-user me-2"></i>Profile</a></li>
                     <li><a class="dropdown-item" href="<?php echo isset($base_url) ? $base_url : ""; ?>/auth/change-password.php"><i class="fas fa-key me-2"></i>Change Password</a></li>
+                    <li>
+                        <a class="dropdown-item" href="<?php echo isset($base_url) ? $base_url : ""; ?>/contact.php">
+                            <i class="fas fa-envelope me-1"></i> Contact Us
+                        </a>
+                    </li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>

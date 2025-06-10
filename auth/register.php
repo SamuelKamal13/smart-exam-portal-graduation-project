@@ -306,7 +306,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <button type="submit" class="btn btn-primary w-100 py-2">Sign Up</button>
                             </div>
                             <div class="text-center">
-                                <p class="mb-0">Already have an account? <a href="login.php">Login here</a>.</p>
+                                <p class="mb-2">Already have an account? <a href="login.php">Login here</a>.</p>
+                                <p class="mb-0">Have questions? <a href="../contact.php">Contact us</a>.</p>
                             </div>
                         </form>
                     </div>

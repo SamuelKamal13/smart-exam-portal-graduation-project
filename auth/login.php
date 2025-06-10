@@ -180,7 +180,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
                             <div class="text-center">
                                 <p class="mb-2">Forgot your password? <a href="reset-password.php">Reset it here</a>.</p>
-                                <p class="mb-0">Don't have an account? <a href="register.php">Sign up now</a>.</p>
+                                <p class="mb-2">Don't have an account? <a href="register.php">Sign up now</a>.</p>
+                                <p class="mb-0">Have questions? <a href="../contact.php">Contact us</a>.</p>
                             </div>
                         </form>
                     </div>

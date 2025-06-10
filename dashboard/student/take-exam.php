@@ -445,7 +445,7 @@ include_once "../../includes/header.php";
 </div>
 
 <!-- Warning Modal -->
-<div class="modal fade" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="warningModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="warningModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
@@ -466,7 +466,7 @@ include_once "../../includes/header.php";
 </div>
 
 <!-- Time's Up Modal -->
-<div class="modal fade" id="timeUpModal" tabindex="-1" role="dialog" aria-labelledby="timeUpModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id="timeUpModal" tabindex="-1" role="dialog" aria-labelledby="timeUpModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header bg-warning text-dark">
@@ -532,6 +532,9 @@ include_once "../../includes/header.php";
             clearInterval(timerInterval);
             document.getElementById("timer").textContent = "00:00:00";
 
+            // Save modal state to localStorage
+            localStorage.setItem('timeUpModalShown_' + attemptId, 'true');
+
             // Show time's up modal
             $('#timeUpModal').modal({
                 backdrop: 'static',
@@ -566,6 +569,10 @@ include_once "../../includes/header.php";
         var formData = new FormData(document.getElementById('exam-form'));
         formData.append('action', 'abandon_exam');
         formData.append('attempt_id', attemptId);
+
+        // Clear localStorage when abandoning exam
+        localStorage.removeItem('timeUpModalShown_' + attemptId);
+        localStorage.removeItem('warningModalShown_' + attemptId);
 
         // Disable the button to prevent multiple clicks
         $('.btn-danger').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
@@ -616,7 +623,13 @@ include_once "../../includes/header.php";
                 // Auto-submit after multiple visibility changes
                 abandonExam();
             } else {
-                // Show warning modal
+                // Save modal state to localStorage
+                localStorage.setItem('warningModalShown_' + attemptId, 'true');
+
+                $('#warningModal').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
                 $('#warningModal').modal('show');
             }
         } else {
@@ -672,6 +685,13 @@ include_once "../../includes/header.php";
             if (visibilityChangeCount >= maxVisibilityChanges) {
                 abandonExam();
             } else {
+                // Save modal state to localStorage
+                localStorage.setItem('warningModalShown_' + attemptId, 'true');
+
+                $('#warningModal').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
                 $('#warningModal').modal('show');
             }
         }
@@ -730,7 +750,14 @@ include_once "../../includes/footer.php";
 
         if (timeRemaining <= 0) {
             clearInterval(timerInterval);
+            // Save modal state to localStorage
+            localStorage.setItem('timeUpModalShown_' + attemptId, 'true');
+
             // Show time up modal
+            $("#timeUpModal").modal({
+                backdrop: 'static',
+                keyboard: false
+            });
             $("#timeUpModal").modal('show');
         } else {
             timeRemaining--;
@@ -741,8 +768,29 @@ include_once "../../includes/footer.php";
         updateTimer();
         timerInterval = setInterval(updateTimer, 1000);
 
+        // Check localStorage for modal states
+        if (localStorage.getItem('warningModalShown_' + attemptId) === 'true') {
+            $('#warningModal').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            $('#warningModal').modal('show');
+        }
+
+        if (localStorage.getItem('timeUpModalShown_' + attemptId) === 'true') {
+            $('#timeUpModal').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            $('#timeUpModal').modal('show');
+        }
+
         // Submit Now button in Time Up modal
         $("#timeUpSubmitBtn").on("click", function() {
+            // Clear localStorage when submitting
+            localStorage.removeItem('timeUpModalShown_' + attemptId);
+            localStorage.removeItem('warningModalShown_' + attemptId);
+
             window.onbeforeunload = null;
             $(window).off('beforeunload');
             $("#exam-form").submit();
@@ -750,6 +798,10 @@ include_once "../../includes/footer.php";
 
         // Remove beforeunload and submit form on Confirm modal button
         $("#submitExamBtn").on("click", function() {
+            // Clear localStorage when submitting
+            localStorage.removeItem('timeUpModalShown_' + attemptId);
+            localStorage.removeItem('warningModalShown_' + attemptId);
+
             window.onbeforeunload = null;
             $(window).off('beforeunload');
             $("#exam-form").submit();

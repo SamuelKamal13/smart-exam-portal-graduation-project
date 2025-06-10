@@ -151,17 +151,10 @@ include_once "../../includes/header.php";
                             </a>
                         </div>
                         <div class="col-md-3 mb-4 text-center">
-                            <a href="view-results.php" class="btn btn-info py-3" style="width: 100%; min-width: 200px;">
-                                <i class="fas fa-chart-bar mr-2"></i> View Results
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-4 text-center">
                             <a href="reports.php" class="btn btn-warning py-3" style="width: 100%; min-width: 200px;">
                                 <i class="fas fa-file-alt mr-2"></i> Reports
                             </a>
                         </div>
-                    </div>
-                    <div class="row justify-content-center">
                         <div class="col-md-3 mb-4 text-center">
                             <a href="generate-codes.php" class="btn btn-danger py-3" style="width: 100%; min-width: 200px;">
                                 <i class="fas fa-key mr-2"></i> Invitation Codes
