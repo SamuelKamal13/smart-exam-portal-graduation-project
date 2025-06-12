@@ -259,7 +259,7 @@ include_once "../../includes/header.php";
                                                     echo '<a href="../exam/take-exam.php?id=' . $exam['id'] . '" class="btn btn-success btn-sm">Take Exam</a>';
                                                 } else {
                                                     // Exam is in the future
-                                                    echo '<span class="badge badge-info">Starts in ' . $days_remaining . ' day' . ($days_remaining != 1 ? 's' : '') . '</span>';
+                                                    echo '<span class="badge text-info">Starts in ' . $days_remaining . ' day' . ($days_remaining != 1 ? 's' : '') . '</span>';
                                                 }
                                                 ?>
                                             </td>
@@ -350,7 +350,7 @@ include_once "../../includes/header.php";
                                             if ($now <= $end_time) {
                                                 echo '<a href="../exam/take-exam.php?id=' . $exam['id'] . '" class="btn btn-success btn-sm">Take Exam</a>';
                                             } else {
-                                                echo '<span class="badge badge-secondary">Expired</span>';
+                                                echo '<span class="badge text-secondary">Expired</span>';
                                             }
                                         }
                                         ?>

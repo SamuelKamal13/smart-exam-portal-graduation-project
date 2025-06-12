@@ -259,7 +259,7 @@ include_once "../../includes/header.php";
                                                             <li class="list-group-item <?php echo $option['is_correct'] ? 'list-group-item-success' : ''; ?>">
                                                                 <?php echo htmlspecialchars($option['option_text']); ?>
                                                                 <?php if ($option['is_correct']): ?>
-                                                                    <span class="badge badge-success float-right">Correct</span>
+                                                                    <span class="badge text-success float-right">Correct</span>
                                                                 <?php endif; ?>
                                                             </li>
                                                         <?php endforeach; ?>

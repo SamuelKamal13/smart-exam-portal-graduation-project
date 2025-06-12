@@ -890,7 +890,7 @@ include_once "../../includes/header.php";
             <div class="card shadow mb-4">                
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">Questions List</h6>
-                    <span class="badge badge-primary"><?php echo count($questions); ?> Total Questions</span>
+                    <span class="badge text-primary"><?php echo count($questions); ?> Total Questions</span>
                 </div><div class="card-body">
                     <?php if (count($questions) > 0): ?>
                         <!-- Search and Filter Controls for Questions List -->
@@ -985,7 +985,7 @@ include_once "../../includes/header.php";
                                 <button id="deleteSelectedBtn" class="btn btn-danger btn-sm mr-2" disabled>
                                     <i class="fas fa-trash"></i> Delete Selected (<span id="questionsSelectedCount">0</span>)
                                 </button>
-                                <span class="badge badge-info"><?php echo count($questions); ?> Total Questions</span>
+                                <span class="badge text-info"><?php echo count($questions); ?> Total Questions</span>
                             </div>
                         </div>
 
@@ -1349,7 +1349,7 @@ include_once "../../includes/header.php";
                             <input type="checkbox" id="selectQuestion${index}" class="question-select" checked>
                             <label for="selectQuestion${index}" class="mb-0 ml-2">Question ${index + 1}</label>
                         </div>
-                        <span class="badge badge-info">${question.type === 'mcq' ? 'Multiple Choice' : 'True/False'}</span>
+                        <span class="badge text-info">${question.type === 'mcq' ? 'Multiple Choice' : 'True/False'}</span>
                     </div>
                     <div class="card-body">
                         <p>${question.text}</p>
