@@ -146,120 +146,120 @@
 .ai-message h4,
 .ai-message h5,
 .ai-message h6 {
-    margin: 10px 0 8px 0;
-    font-weight: 600;
-    line-height: 1.3;
+  margin: 10px 0 8px 0;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
 .ai-message h1 {
-    font-size: 1.2rem;
-    color: #4e73df;
-    border-bottom: 1px solid #e3e6f0;
-    padding-bottom: 3px;
+  font-size: 1.2rem;
+  color: #4e73df;
+  border-bottom: 1px solid #e3e6f0;
+  padding-bottom: 3px;
 }
 
 .ai-message h2 {
-    font-size: 1.1rem;
-    color: #5a5c69;
+  font-size: 1.1rem;
+  color: #5a5c69;
 }
 
 .ai-message h3 {
-    font-size: 1rem;
-    color: #5a5c69;
+  font-size: 1rem;
+  color: #5a5c69;
 }
 
 .ai-message p {
-    margin: 6px 0;
-    line-height: 1.5;
+  margin: 6px 0;
+  line-height: 1.5;
 }
 
 .ai-message strong {
-    font-weight: 600;
-    color: #2c2c2c;
+  font-weight: 600;
+  color: #2c2c2c;
 }
 
 .ai-message em {
-    font-style: italic;
-    color: #5a5c69;
+  font-style: italic;
+  color: #5a5c69;
 }
 
 .ai-message code {
-    background-color: #f8f9fc;
-    color: #e83e8c;
-    padding: 1px 4px;
-    border-radius: 3px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.85em;
-    border: 1px solid #e3e6f0;
+  background-color: #f8f9fc;
+  color: #e83e8c;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: "Courier New", monospace;
+  font-size: 0.85em;
+  border: 1px solid #e3e6f0;
 }
 
 .ai-message pre {
-    background-color: #f8f9fc;
-    border: 1px solid #e3e6f0;
-    border-radius: 4px;
-    padding: 8px;
-    overflow-x: auto;
-    margin: 8px 0;
-    max-width: 100%;
+  background-color: #f8f9fc;
+  border: 1px solid #e3e6f0;
+  border-radius: 4px;
+  padding: 8px;
+  overflow-x: auto;
+  margin: 8px 0;
+  max-width: 100%;
 }
 
 .ai-message pre code {
-    background: none;
-    border: none;
-    padding: 0;
-    color: #333;
-    font-size: 0.8rem;
-    line-height: 1.4;
+  background: none;
+  border: none;
+  padding: 0;
+  color: #333;
+  font-size: 0.8rem;
+  line-height: 1.4;
 }
 
 .ai-message ul,
 .ai-message ol {
-    margin: 8px 0;
-    padding-left: 20px;
+  margin: 8px 0;
+  padding-left: 20px;
 }
 
 .ai-message li {
-    margin: 3px 0;
-    line-height: 1.4;
+  margin: 3px 0;
+  line-height: 1.4;
 }
 
 .ai-message ul li {
-    list-style-type: disc;
+  list-style-type: disc;
 }
 
 .ai-message ol li {
-    list-style-type: decimal;
+  list-style-type: decimal;
 }
 
 .ai-message a {
-    color: #4e73df;
-    text-decoration: none;
-    border-bottom: 1px dotted #4e73df;
-    transition: color 0.3s;
+  color: #4e73df;
+  text-decoration: none;
+  border-bottom: 1px dotted #4e73df;
+  transition: color 0.3s;
 }
 
 .ai-message a:hover {
-    color: #2e59d9;
-    border-bottom-color: #2e59d9;
-    text-decoration: none;
+  color: #2e59d9;
+  border-bottom-color: #2e59d9;
+  text-decoration: none;
 }
 
 .ai-message blockquote {
-    border-left: 3px solid #4e73df;
-    padding-left: 10px;
-    margin: 8px 0;
-    font-style: italic;
-    color: #5a5c69;
-    background-color: #f8f9fc;
-    padding: 8px 10px;
-    border-radius: 0 3px 3px 0;
+  border-left: 3px solid #4e73df;
+  padding-left: 10px;
+  margin: 8px 0;
+  font-style: italic;
+  color: #5a5c69;
+  background-color: #f8f9fc;
+  padding: 8px 10px;
+  border-radius: 0 3px 3px 0;
 }
 
 /* Improve spacing for markdown content in floating chat */
 .ai-message > *:first-child {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 .ai-message > *:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
