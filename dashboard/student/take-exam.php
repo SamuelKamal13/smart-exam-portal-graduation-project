@@ -348,21 +348,98 @@ $fullscreen_mode = true;
 include_once "../../includes/header.php";
 ?>
 
-<div class="container-fluid">
+<style>
+.sticky-timer-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    background: #fff;
+    border-bottom: 2px solid #4e73df;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.exam-content {
+    margin-top: 80px; /* Adjust based on header height */
+}
+
+.sticky-timer-header .container-fluid {
+    max-width: 100%;
+}
+
+/* Ensure timer is highly visible */
+#timer {
+    font-size: 1.2rem;
+    background: #f8f9fc;
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #e3e6f0;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .sticky-timer-header h6 {
+        font-size: 0.9rem;
+    }
+    
+    .sticky-timer-header .btn {
+        padding: 6px 12px;
+        font-size: 0.875rem;
+    }
+    
+    #timer {
+        font-size: 1rem;
+        padding: 6px 10px;
+    }
+    
+    .exam-content {
+        margin-top: 90px;
+    }
+}
+
+@media (max-width: 576px) {
+    .sticky-timer-header .d-flex {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .sticky-timer-header .d-flex > div:last-child {
+        margin-top: 10px;
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .exam-content {
+        margin-top: 120px;
+    }
+}
+</style>
+
+<!-- Sticky Timer Header -->
+<div class="sticky-timer-header">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center py-3">
+            <h6 class="m-0 font-weight-bold text-primary"><?php echo htmlspecialchars($exam["title"]); ?></h6>
+            <div class="d-flex align-items-center">
+                <div class="mr-3">
+                    <span class="font-weight-bold">Time Remaining:</span>
+                    <span id="timer" class="text-danger font-weight-bold"></span>
+                </div>
+                <button type="button" id="submit-btn" class="btn btn-primary" onclick="confirmSubmit()">
+                    <i class="fas fa-paper-plane"></i> Submit Exam
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid exam-content">
     <div class="row">
         <div class="col-12">
             <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary"><?php echo htmlspecialchars($exam["title"]); ?></h6>
-                    <div class="d-flex align-items-center">
-                        <div class="mr-3">
-                            <span class="font-weight-bold">Time Remaining:</span>
-                            <span id="timer" class="text-danger font-weight-bold"></span>
-                        </div>
-                        <button type="button" id="submit-btn" class="btn btn-primary" onclick="confirmSubmit()">
-                            <i class="fas fa-paper-plane"></i> Submit Exam
-                        </button>
-                    </div>
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Exam Questions</h6>
                 </div>
                 <div class="card-body">
                     <form id="exam-form" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . "?id=" . $exam_id; ?>">
