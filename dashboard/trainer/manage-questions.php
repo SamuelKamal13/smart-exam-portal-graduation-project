@@ -575,8 +575,7 @@ include_once "../../includes/header.php";
                         </div>
                     </form>
                 </div>
-            </div>
-            <div class="card shadow mb-4">
+            </div>            <div class="card shadow mb-4">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Add Questions from Question Bank</h6>
                 </div>
@@ -605,10 +604,45 @@ include_once "../../includes/header.php";
                     ?>
 
                     <?php if (count($bank_questions) > 0): ?>
+                        <!-- Search and Filter Controls -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="questionSearch">Search Questions:</label>
+                                    <input type="text" id="questionSearch" class="form-control" placeholder="Search by question text or exam title...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="typeFilter">Filter by Type:</label>
+                                    <select id="typeFilter" class="form-control">
+                                        <option value="">All Types</option>
+                                        <option value="mcq">Multiple Choice</option>
+                                        <option value="true_false">True/False</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="marksFilter">Filter by Marks:</label>
+                                    <select id="marksFilter" class="form-control">
+                                        <option value="">All Marks</option>
+                                        <?php
+                                        $unique_marks = array_unique(array_column($bank_questions, 'marks'));
+                                        sort($unique_marks);
+                                        foreach ($unique_marks as $marks): ?>
+                                            <option value="<?php echo $marks; ?>"><?php echo $marks; ?> mark(s)</option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
                         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"] . "?exam_id=" . $exam_id); ?>" method="post">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" width="100%" cellspacing="0">
-                                    <thead>
+                            <!-- Scrollable table container with fixed height -->
+                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto; border: 1px solid #dee2e6;">
+                                <table class="table table-bordered table-hover mt-0 mb-0" width="100%" cellspacing="0" id="questionBankTable">
+                                    <thead class="thead-light" style="position: sticky; top: 0; z-index: 10;">
                                         <tr>
                                             <th width="5%"><input type="checkbox" id="selectAll"></th>
                                             <th width="50%">Question</th>
@@ -617,18 +651,22 @@ include_once "../../includes/header.php";
                                             <th width="20%">Source Exam</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="questionBankTableBody">
                                         <?php foreach ($bank_questions as $question): ?>
-                                            <tr>
-                                                <td><input type="checkbox" name="bank_questions[]" value="<?php echo $question['id']; ?>"></td>
+                                            <tr class="question-row" 
+                                                data-question-text="<?php echo strtolower(htmlspecialchars($question['question_text'])); ?>"
+                                                data-question-type="<?php echo $question['question_type']; ?>"
+                                                data-question-marks="<?php echo $question['marks']; ?>"
+                                                data-exam-title="<?php echo strtolower(htmlspecialchars($question['exam_titles'])); ?>">
+                                                <td><input type="checkbox" name="bank_questions[]" value="<?php echo $question['id']; ?>" class="question-checkbox"></td>
                                                 <td><?php echo htmlspecialchars($question['question_text']); ?></td>
                                                 <td>
                                                     <?php if ($question['question_type'] == 'mcq'): ?>
                                                         <span class="badge text-info">Multiple Choice</span>
                                                     <?php elseif ($question['question_type'] == 'true_false'): ?>
-                                                        <span class="badge text-info">True/False</span>
+                                                        <span class="badge text-success">True/False</span>
                                                     <?php else: ?>
-                                                        <span class="badge badge-info"><?php echo ucfirst($question['question_type']); ?></span>
+                                                        <span class="badge text-secondary"><?php echo ucfirst($question['question_type']); ?></span>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td><?php echo $question['marks']; ?></td>
@@ -636,7 +674,7 @@ include_once "../../includes/header.php";
                                                     <?php
                                                     $exam_titles = $question['exam_titles'];
                                                     if (strlen($exam_titles) > 50) {
-                                                        echo substr($exam_titles, 0, 47) . '...';
+                                                        echo '<span title="' . htmlspecialchars($exam_titles) . '">' . substr($exam_titles, 0, 47) . '...</span>';
                                                     } else {
                                                         echo $exam_titles;
                                                     }
@@ -647,20 +685,125 @@ include_once "../../includes/header.php";
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="form-group mt-3">
-                                <button type="submit" name="add_from_bank" class="btn btn-primary">
-                                    <i class="fas fa-plus-circle"></i> Add Selected Questions
+
+                            <!-- Results info and action button -->
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <small class="text-muted" id="resultsInfo">
+                                    Showing <span id="visibleCount"><?php echo count($bank_questions); ?></span> of <?php echo count($bank_questions); ?> questions
+                                </small>
+                                <button type="submit" name="add_from_bank" class="btn btn-primary" id="addFromBankBtn" disabled>
+                                    <i class="fas fa-plus-circle"></i> Add Selected Questions (<span id="selectedCount">0</span>)
                                 </button>
                             </div>
                         </form>
 
                         <script>
-                            // Script to handle "Select All" checkbox
-                            document.getElementById('selectAll').addEventListener('change', function() {
-                                const checkboxes = document.querySelectorAll('input[name="bank_questions[]"]');
-                                checkboxes.forEach(checkbox => {
-                                    checkbox.checked = this.checked;
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const questionSearch = document.getElementById('questionSearch');
+                                const typeFilter = document.getElementById('typeFilter');
+                                const marksFilter = document.getElementById('marksFilter');
+                                const questionRows = document.querySelectorAll('.question-row');
+                                const selectAllCheckbox = document.getElementById('selectAll');
+                                const addFromBankBtn = document.getElementById('addFromBankBtn');
+                                const visibleCountSpan = document.getElementById('visibleCount');
+                                const selectedCountSpan = document.getElementById('selectedCount');
+                                const totalQuestions = <?php echo count($bank_questions); ?>;
+
+                                // Filter and search functionality
+                                function filterQuestions() {
+                                    const searchTerm = questionSearch.value.toLowerCase();
+                                    const typeFilterValue = typeFilter.value;
+                                    const marksFilterValue = marksFilter.value;
+                                    
+                                    let visibleCount = 0;
+                                    
+                                    questionRows.forEach(row => {
+                                        const questionText = row.dataset.questionText;
+                                        const examTitle = row.dataset.examTitle;
+                                        const questionType = row.dataset.questionType;
+                                        const questionMarks = row.dataset.questionMarks;
+                                        
+                                        const matchesSearch = searchTerm === '' || 
+                                            questionText.includes(searchTerm) || 
+                                            examTitle.includes(searchTerm);
+                                        
+                                        const matchesType = typeFilterValue === '' || questionType === typeFilterValue;
+                                        const matchesMarks = marksFilterValue === '' || questionMarks === marksFilterValue;
+                                        
+                                        if (matchesSearch && matchesType && matchesMarks) {
+                                            row.style.display = '';
+                                            visibleCount++;
+                                        } else {
+                                            row.style.display = 'none';
+                                            // Uncheck hidden rows
+                                            const checkbox = row.querySelector('input[type="checkbox"]');
+                                            if (checkbox.checked) {
+                                                checkbox.checked = false;
+                                                updateSelectedCount();
+                                            }
+                                        }
+                                    });
+                                    
+                                    visibleCountSpan.textContent = visibleCount;
+                                    
+                                    // Update select all checkbox state
+                                    updateSelectAllState();
+                                }
+
+                                // Update selected count and button state
+                                function updateSelectedCount() {
+                                    const checkedBoxes = document.querySelectorAll('.question-checkbox:checked');
+                                    const count = checkedBoxes.length;
+                                    selectedCountSpan.textContent = count;
+                                    addFromBankBtn.disabled = count === 0;
+                                }
+
+                                // Update select all checkbox state
+                                function updateSelectAllState() {
+                                    const visibleCheckboxes = [];
+                                    questionRows.forEach(row => {
+                                        if (row.style.display !== 'none') {
+                                            visibleCheckboxes.push(row.querySelector('.question-checkbox'));
+                                        }
+                                    });
+                                    
+                                    const checkedVisible = visibleCheckboxes.filter(cb => cb.checked).length;
+                                    
+                                    selectAllCheckbox.indeterminate = checkedVisible > 0 && checkedVisible < visibleCheckboxes.length;
+                                    selectAllCheckbox.checked = visibleCheckboxes.length > 0 && checkedVisible === visibleCheckboxes.length;
+                                }
+
+                                // Event listeners
+                                questionSearch.addEventListener('input', filterQuestions);
+                                typeFilter.addEventListener('change', filterQuestions);
+                                marksFilter.addEventListener('change', filterQuestions);
+
+                                // Select all functionality (only for visible rows)
+                                selectAllCheckbox.addEventListener('change', function() {
+                                    const visibleCheckboxes = [];
+                                    questionRows.forEach(row => {
+                                        if (row.style.display !== 'none') {
+                                            visibleCheckboxes.push(row.querySelector('.question-checkbox'));
+                                        }
+                                    });
+                                    
+                                    visibleCheckboxes.forEach(checkbox => {
+                                        checkbox.checked = this.checked;
+                                    });
+                                    
+                                    updateSelectedCount();
                                 });
+
+                                // Individual checkbox change
+                                document.querySelectorAll('.question-checkbox').forEach(checkbox => {
+                                    checkbox.addEventListener('change', function() {
+                                        updateSelectedCount();
+                                        updateSelectAllState();
+                                    });
+                                });
+
+                                // Initialize counts
+                                updateSelectedCount();
                             });
                         </script>
                     <?php else: ?>
@@ -744,21 +887,50 @@ include_once "../../includes/header.php";
 
     <div class="row">
         <div class="col-lg-12">
-            <div class="card shadow mb-4">
+            <div class="card shadow mb-4">                
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">Questions List</h6>
-                    <div>
-                        <button id="deleteSelectedBtn" class="btn btn-danger btn-sm mr-2" disabled>
-                            <i class="fas fa-trash"></i> Delete Selected
-                        </button>
-                        <span class="badge text-info"><?php echo count($questions); ?> Questions</span>
-                    </div>
-                </div>
-                <div class="card-body">
+                    <span class="badge badge-primary"><?php echo count($questions); ?> Total Questions</span>
+                </div><div class="card-body">
                     <?php if (count($questions) > 0): ?>
-                        <div class="table-responsive">
-                            <table class="table table-bordered" width="100%" cellspacing="0">
-                                <thead>
+                        <!-- Search and Filter Controls for Questions List -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="questionsSearch">Search Questions:</label>
+                                    <input type="text" id="questionsSearch" class="form-control" placeholder="Search by question text...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="questionsTypeFilter">Filter by Type:</label>
+                                    <select id="questionsTypeFilter" class="form-control">
+                                        <option value="">All Types</option>
+                                        <option value="mcq">Multiple Choice</option>
+                                        <option value="true_false">True/False</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="questionsMarksFilter">Filter by Marks:</label>
+                                    <select id="questionsMarksFilter" class="form-control">
+                                        <option value="">All Marks</option>
+                                        <?php
+                                        $unique_marks = array_unique(array_column($questions, 'marks'));
+                                        sort($unique_marks);
+                                        foreach ($unique_marks as $marks): ?>
+                                            <option value="<?php echo $marks; ?>"><?php echo $marks; ?> mark(s)</option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Scrollable table container with fixed height -->
+                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto; border: 1px solid #dee2e6;">
+                            <table class="table table-bordered table-hover mt-0 mb-0" width="100%" cellspacing="0" id="questionsListTable">
+                                <thead class="thead-light" style="position: sticky; top: 0; z-index: 10;">
                                     <tr>
                                         <th width="5%"><input type="checkbox" id="selectAllQuestions"></th>
                                         <th width="5%">#</th>
@@ -769,19 +941,23 @@ include_once "../../includes/header.php";
                                         <th width="10%">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="questionsListTableBody">
                                     <?php foreach ($questions as $index => $question): ?>
-                                        <tr>
-                                            <td><input type="checkbox" class="question-checkbox" value="<?php echo $question['id']; ?>"></td>
-                                            <td><?php echo $index + 1; ?></td>
+                                        <tr class="questions-list-row" 
+                                            data-question-text="<?php echo strtolower(htmlspecialchars($question['question_text'])); ?>"
+                                            data-question-type="<?php echo $question['question_type']; ?>"
+                                            data-question-marks="<?php echo $question['marks']; ?>"
+                                            data-question-number="<?php echo $index + 1; ?>">
+                                            <td><input type="checkbox" class="questions-list-checkbox" value="<?php echo $question['id']; ?>"></td>
+                                            <td class="question-number"><?php echo $index + 1; ?></td>
                                             <td><?php echo htmlspecialchars($question['question_text']); ?></td>
                                             <td>
                                                 <?php if ($question['question_type'] == 'mcq'): ?>
                                                     <span class="badge text-info">Multiple Choice</span>
                                                 <?php elseif ($question['question_type'] == 'true_false'): ?>
-                                                    <span class="badge text-info">True/False</span>
+                                                    <span class="badge text-success">True/False</span>
                                                 <?php else: ?>
-                                                    <span class="badge badge-info"><?php echo ucfirst($question['question_type']); ?></span>
+                                                    <span class="badge text-secondary"><?php echo ucfirst($question['question_type']); ?></span>
                                                 <?php endif; ?>
                                             </td>
                                             <td><?php echo $question['marks']; ?></td>
@@ -799,6 +975,166 @@ include_once "../../includes/header.php";
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- Results info and action buttons -->
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <small class="text-muted" id="questionsResultsInfo">
+                                Showing <span id="questionsVisibleCount"><?php echo count($questions); ?></span> of <?php echo count($questions); ?> questions
+                            </small>
+                            <div>
+                                <button id="deleteSelectedBtn" class="btn btn-danger btn-sm mr-2" disabled>
+                                    <i class="fas fa-trash"></i> Delete Selected (<span id="questionsSelectedCount">0</span>)
+                                </button>
+                                <span class="badge badge-info"><?php echo count($questions); ?> Total Questions</span>
+                            </div>
+                        </div>
+
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const questionsSearch = document.getElementById('questionsSearch');
+                                const questionsTypeFilter = document.getElementById('questionsTypeFilter');
+                                const questionsMarksFilter = document.getElementById('questionsMarksFilter');
+                                const questionsRows = document.querySelectorAll('.questions-list-row');
+                                const selectAllQuestionsCheckbox = document.getElementById('selectAllQuestions');
+                                const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+                                const questionsVisibleCountSpan = document.getElementById('questionsVisibleCount');
+                                const questionsSelectedCountSpan = document.getElementById('questionsSelectedCount');
+                                const totalQuestions = <?php echo count($questions); ?>;
+
+                                // Filter and search functionality for questions list
+                                function filterQuestionsList() {
+                                    const searchTerm = questionsSearch.value.toLowerCase();
+                                    const typeFilterValue = questionsTypeFilter.value;
+                                    const marksFilterValue = questionsMarksFilter.value;
+                                    
+                                    let visibleCount = 0;
+                                    let questionNumber = 1;
+                                    
+                                    questionsRows.forEach(row => {
+                                        const questionText = row.dataset.questionText;
+                                        const questionType = row.dataset.questionType;
+                                        const questionMarks = row.dataset.questionMarks;
+                                        
+                                        const matchesSearch = searchTerm === '' || questionText.includes(searchTerm);
+                                        const matchesType = typeFilterValue === '' || questionType === typeFilterValue;
+                                        const matchesMarks = marksFilterValue === '' || questionMarks === marksFilterValue;
+                                        
+                                        if (matchesSearch && matchesType && matchesMarks) {
+                                            row.style.display = '';
+                                            // Update question numbers for visible rows
+                                            const numberCell = row.querySelector('.question-number');
+                                            if (numberCell) {
+                                                numberCell.textContent = questionNumber;
+                                            }
+                                            questionNumber++;
+                                            visibleCount++;
+                                        } else {
+                                            row.style.display = 'none';
+                                            // Uncheck hidden rows
+                                            const checkbox = row.querySelector('input[type="checkbox"]');
+                                            if (checkbox.checked) {
+                                                checkbox.checked = false;
+                                                updateQuestionsSelectedCount();
+                                            }
+                                        }
+                                    });
+                                    
+                                    questionsVisibleCountSpan.textContent = visibleCount;
+                                    
+                                    // Update select all checkbox state
+                                    updateQuestionsSelectAllState();
+                                }
+
+                                // Update selected count and button state for questions list
+                                function updateQuestionsSelectedCount() {
+                                    const checkedBoxes = document.querySelectorAll('.questions-list-checkbox:checked');
+                                    const count = checkedBoxes.length;
+                                    questionsSelectedCountSpan.textContent = count;
+                                    deleteSelectedBtn.disabled = count === 0;
+                                }
+
+                                // Update select all checkbox state for questions list
+                                function updateQuestionsSelectAllState() {
+                                    const visibleCheckboxes = [];
+                                    questionsRows.forEach(row => {
+                                        if (row.style.display !== 'none') {
+                                            visibleCheckboxes.push(row.querySelector('.questions-list-checkbox'));
+                                        }
+                                    });
+                                    
+                                    const checkedVisible = visibleCheckboxes.filter(cb => cb.checked).length;
+                                    
+                                    selectAllQuestionsCheckbox.indeterminate = checkedVisible > 0 && checkedVisible < visibleCheckboxes.length;
+                                    selectAllQuestionsCheckbox.checked = visibleCheckboxes.length > 0 && checkedVisible === visibleCheckboxes.length;
+                                }
+
+                                // Event listeners for questions list
+                                questionsSearch.addEventListener('input', filterQuestionsList);
+                                questionsTypeFilter.addEventListener('change', filterQuestionsList);
+                                questionsMarksFilter.addEventListener('change', filterQuestionsList);
+
+                                // Select all functionality for questions list (only for visible rows)
+                                selectAllQuestionsCheckbox.addEventListener('change', function() {
+                                    const visibleCheckboxes = [];
+                                    questionsRows.forEach(row => {
+                                        if (row.style.display !== 'none') {
+                                            visibleCheckboxes.push(row.querySelector('.questions-list-checkbox'));
+                                        }
+                                    });
+                                    
+                                    visibleCheckboxes.forEach(checkbox => {
+                                        checkbox.checked = this.checked;
+                                    });
+                                    
+                                    updateQuestionsSelectedCount();
+                                });
+
+                                // Individual checkbox change for questions list
+                                document.querySelectorAll('.questions-list-checkbox').forEach(checkbox => {
+                                    checkbox.addEventListener('change', function() {
+                                        updateQuestionsSelectedCount();
+                                        updateQuestionsSelectAllState();
+                                    });
+                                });
+
+                                // Delete selected questions functionality
+                                deleteSelectedBtn.addEventListener('click', function() {
+                                    const selectedQuestions = document.querySelectorAll('.questions-list-checkbox:checked');
+                                    if (selectedQuestions.length === 0) {
+                                        alert('Please select at least one question to delete.');
+                                        return;
+                                    }
+
+                                    if (confirm(`Are you sure you want to delete ${selectedQuestions.length} selected question(s)?`)) {
+                                        const form = document.createElement('form');
+                                        form.method = 'POST';
+                                        form.action = window.location.href;
+
+                                        // Add delete action input
+                                        const deleteInput = document.createElement('input');
+                                        deleteInput.type = 'hidden';
+                                        deleteInput.name = 'delete_questions';
+                                        deleteInput.value = '1';
+                                        form.appendChild(deleteInput);
+
+                                        // Add selected question IDs
+                                        selectedQuestions.forEach(checkbox => {
+                                            const idInput = document.createElement('input');
+                                            idInput.type = 'hidden';
+                                            idInput.name = 'question_ids[]';
+                                            idInput.value = checkbox.value;
+                                            form.appendChild(idInput);
+                                        });
+
+                                        document.body.appendChild(form);
+                                        form.submit();
+                                    }
+                                });
+
+                                // Initialize counts for questions list
+                                updateQuestionsSelectedCount();
+                            });
+                        </script>
                     <?php else: ?>
                         <div class="alert alert-info">
                             No questions added yet. Use the form above to add questions to this exam.
@@ -1159,6 +1495,113 @@ include_once "../../includes/header.php";
         font-size: 12px;
         color: #6c757d;
         margin-bottom: 0;
+    }    /* Question Bank Table Styles */
+    #questionBankTable,
+    #questionsListTable {
+        font-size: 0.9rem;
+    }
+
+    #questionBankTable thead th,
+    #questionsListTable thead th {
+        background-color: #f8f9fc !important;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        color: #5a5c69;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    #questionBankTable tbody tr,
+    #questionsListTable tbody tr {
+        transition: background-color 0.15s ease-in-out;
+    }
+
+    #questionBankTable tbody tr:hover,
+    #questionsListTable tbody tr:hover {
+        background-color: #f8f9fc;
+    }
+
+    #questionBankTable td,
+    #questionsListTable td {
+        vertical-align: middle;
+        padding: 0.75rem 0.5rem;
+    }
+
+    /* Scrollable container */
+    .table-responsive {
+        border-radius: 0.375rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    }
+
+    /* Custom scrollbar for webkit browsers */
+    .table-responsive::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 4px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }    /* Checkbox styling */
+    .question-checkbox,
+    .questions-list-checkbox,
+    #selectAll,
+    #selectAllQuestions {
+        transform: scale(1.2);
+        cursor: pointer;
+    }
+
+    /* Badge styling improvements */
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.5rem;
+    }
+
+    /* Filter controls styling */
+    .form-control:focus {
+        border-color: #4e73df;
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+
+    /* Results info styling */
+    #resultsInfo {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+
+    /* Button hover effects */
+    #addFromBankBtn:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+    }
+
+    /* Tooltip for truncated exam titles */
+    [title]:hover {
+        cursor: help;
+    }    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        #questionBankTable,
+        #questionsListTable {
+            font-size: 0.8rem;
+        }
+        
+        #questionBankTable td,
+        #questionsListTable td {
+            padding: 0.5rem 0.25rem;
+        }
+        
+        .table-responsive {
+            max-height: 300px !important;
+        }
     }
 </style>
 
