@@ -8,9 +8,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
 $is_exam_page = ($current_page === 'take-exam.php');
 
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true && !$is_exam_page && !isset($no_floating_chat)):
-?>
-    <!-- Floating Chat Bot -->
+?>    <!-- Floating Chat Bot -->
     <link rel="stylesheet" href="<?php echo isset($base_url) ? $base_url : ""; ?>/assets/css/floating-chat.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
 
     <div class="floating-chat-container">
         <div class="chat-bubble" id="chatBubble">
@@ -100,14 +100,32 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true && !$is_exam_
                         console.error('Error:', error);
                         addMessageToChat('ai', 'Sorry, an error occurred while processing your request.');
                     });
-            }
-
-            // Function to add message to chat
+            }            // Function to add message to chat
             function addMessageToChat(sender, message) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = sender === 'user' ? 'user-message' : 'ai-message';
                 messageDiv.className += ' clearfix';
-                messageDiv.textContent = message;
+                
+                if (sender === 'ai' && typeof marked !== 'undefined') {
+                    // Parse markdown for AI responses
+                    try {
+                        // Configure marked options for security
+                        marked.setOptions({
+                            breaks: true,
+                            gfm: true,
+                            sanitize: false,
+                            smartypants: true
+                        });
+                        messageDiv.innerHTML = marked.parse(message);
+                    } catch (error) {
+                        console.error('Markdown parsing error:', error);
+                        // Fallback to plain text with line breaks
+                        messageDiv.innerHTML = message.replace(/\n/g, '<br>');
+                    }
+                } else {
+                    // Plain text for user messages
+                    messageDiv.textContent = message;
+                }
 
                 chatMessages.appendChild(messageDiv);
                 chatMessages.scrollTop = chatMessages.scrollHeight;

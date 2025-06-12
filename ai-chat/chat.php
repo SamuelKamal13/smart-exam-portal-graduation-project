@@ -18,6 +18,9 @@ $base_url = "..";
 // Add custom CSS for AI chat
 $extra_css = '<link rel="stylesheet" href="' . $base_url . '/assets/css/ai-chat.css">';
 
+// Add marked.js library for Markdown parsing
+$extra_js = '<script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>';
+
 // Include header
 include "../includes/header.php";
 
@@ -114,8 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["message"])) {
                     <i class="fas fa-robot"></i>
                     <h6>Chat with AI Assistant</h6>
                 </div>
-                <div class="card-body">
-                    <div class="chat-container" id="chatContainer">
+                <div class="card-body">                    <div class="chat-container" id="chatContainer">
                         <?php if (count($history) > 0): ?>
                             <?php foreach (array_reverse($history) as $chat): ?>
                                 <div class="user-message clearfix">
@@ -124,7 +126,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["message"])) {
                                 </div>
                                 <div class="ai-message clearfix">
                                     <div class="font-weight-bold">AI Assistant</div>
-                                    <div><?php echo nl2br(htmlspecialchars($chat['response'])); ?></div>
+                                    <div class="markdown-content" data-markdown="<?php echo htmlspecialchars($chat['response']); ?>">
+                                        <?php echo nl2br(htmlspecialchars($chat['response'])); ?>
+                                    </div>
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -147,13 +151,81 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["message"])) {
 </div>
 
 <script>
-    // Scroll to the bottom of the chat container when the page loads
+    // Configure marked.js options
     document.addEventListener('DOMContentLoaded', function() {
+        // Configure marked.js for security and styling
+        if (typeof marked !== 'undefined') {
+            marked.setOptions({
+                breaks: true,
+                gfm: true,
+                sanitize: false,
+                smartypants: true
+            });
+        }
+        
         var chatContainer = document.getElementById('chatContainer');
         if (chatContainer) {
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
+        
+        // Parse all markdown content
+        parseMarkdownContent();
     });
+    
+    function parseMarkdownContent() {
+        const markdownElements = document.querySelectorAll('.markdown-content[data-markdown]');
+        markdownElements.forEach(element => {
+            const markdownText = element.getAttribute('data-markdown');
+            if (markdownText && typeof marked !== 'undefined') {
+                try {
+                    element.innerHTML = marked.parse(markdownText);
+                } catch (error) {
+                    console.error('Markdown parsing error:', error);
+                    // Fallback to plain text with line breaks
+                    element.innerHTML = markdownText.replace(/\n/g, '<br>');
+                }
+            }
+        });
+    }
+    
+    // Function to add new message with markdown formatting (for future use)
+    function addMarkdownMessage(userMessage, aiResponse) {
+        const chatContainer = document.getElementById('chatContainer');
+        
+        // Add user message
+        const userDiv = document.createElement('div');
+        userDiv.className = 'user-message clearfix';
+        userDiv.innerHTML = `
+            <div class="font-weight-bold">You</div>
+            <div>${userMessage.replace(/\n/g, '<br>')}</div>
+        `;
+        chatContainer.appendChild(userDiv);
+        
+        // Add AI response with markdown formatting
+        const aiDiv = document.createElement('div');
+        aiDiv.className = 'ai-message clearfix';
+        let formattedResponse = aiResponse;
+        
+        if (typeof marked !== 'undefined') {
+            try {
+                formattedResponse = marked.parse(aiResponse);
+            } catch (error) {
+                console.error('Markdown parsing error:', error);
+                formattedResponse = aiResponse.replace(/\n/g, '<br>');
+            }
+        } else {
+            formattedResponse = aiResponse.replace(/\n/g, '<br>');
+        }
+        
+        aiDiv.innerHTML = `
+            <div class="font-weight-bold">AI Assistant</div>
+            <div class="markdown-content">${formattedResponse}</div>
+        `;
+        chatContainer.appendChild(aiDiv);
+        
+        // Scroll to bottom
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
 </script>
 
 <?php
