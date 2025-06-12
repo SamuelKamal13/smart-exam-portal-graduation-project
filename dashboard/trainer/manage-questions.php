@@ -273,25 +273,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $error_message = "Error deleting question.";
             }
             mysqli_stmt_close($stmt);
-        }
-    } elseif (isset($_POST["delete_questions"]) && isset($_POST["question_ids"])) {
+        }    } elseif (isset($_POST["delete_questions"]) && isset($_POST["question_ids"])) {
         // Delete multiple questions
         $question_ids = $_POST["question_ids"];
         $success_count = 0;
         $error_count = 0;
 
-        foreach ($question_ids as $question_id) {
-            $sql = "DELETE FROM questions WHERE id = ? AND exam_id = ?";
-            if ($stmt = mysqli_prepare($conn, $sql)) {
-                mysqli_stmt_bind_param($stmt, "ii", $question_id, $exam_id);
-                if (mysqli_stmt_execute($stmt)) {
-                    $success_count++;
+        // Debug logging
+        error_log("Multi-delete request received. Question IDs: " . json_encode($question_ids));
+        error_log("Exam ID: " . $exam_id);
+
+        // Validate that we have an array and it's not empty
+        if (!is_array($question_ids) || empty($question_ids)) {
+            $error_message = "No questions selected for deletion.";
+            error_log("Multi-delete failed: No questions selected");
+        } else {
+            foreach ($question_ids as $question_id) {
+                // Validate that the question ID is numeric
+                if (!is_numeric($question_id)) {
+                    $error_count++;
+                    error_log("Multi-delete: Invalid question ID: " . $question_id);
+                    continue;
+                }
+                
+                $question_id = intval($question_id);
+                
+                $sql = "DELETE FROM questions WHERE id = ? AND exam_id = ?";
+                if ($stmt = mysqli_prepare($conn, $sql)) {
+                    mysqli_stmt_bind_param($stmt, "ii", $question_id, $exam_id);
+                    if (mysqli_stmt_execute($stmt)) {
+                        if (mysqli_affected_rows($conn) > 0) {
+                            $success_count++;
+                            error_log("Multi-delete: Successfully deleted question ID: " . $question_id);
+                        } else {
+                            $error_count++;
+                            error_log("Multi-delete: Question not found or doesn't belong to exam: " . $question_id);
+                        }
+                    } else {
+                        $error_count++;
+                        error_log("Multi-delete: SQL execution failed for question ID: " . $question_id . " Error: " . mysqli_error($conn));
+                    }
+                    mysqli_stmt_close($stmt);
                 } else {
                     $error_count++;
+                    error_log("Multi-delete: SQL preparation failed for question ID: " . $question_id . " Error: " . mysqli_error($conn));
                 }
-                mysqli_stmt_close($stmt);
-            } else {
-                $error_count++;
             }
         }
 
@@ -1087,48 +1113,12 @@ include_once "../../includes/header.php";
                                     });
                                     
                                     updateQuestionsSelectedCount();
-                                });
-
-                                // Individual checkbox change for questions list
+                                });                                // Individual checkbox change for questions list
                                 document.querySelectorAll('.questions-list-checkbox').forEach(checkbox => {
                                     checkbox.addEventListener('change', function() {
                                         updateQuestionsSelectedCount();
                                         updateQuestionsSelectAllState();
                                     });
-                                });
-
-                                // Delete selected questions functionality
-                                deleteSelectedBtn.addEventListener('click', function() {
-                                    const selectedQuestions = document.querySelectorAll('.questions-list-checkbox:checked');
-                                    if (selectedQuestions.length === 0) {
-                                        alert('Please select at least one question to delete.');
-                                        return;
-                                    }
-
-                                    if (confirm(`Are you sure you want to delete ${selectedQuestions.length} selected question(s)?`)) {
-                                        const form = document.createElement('form');
-                                        form.method = 'POST';
-                                        form.action = window.location.href;
-
-                                        // Add delete action input
-                                        const deleteInput = document.createElement('input');
-                                        deleteInput.type = 'hidden';
-                                        deleteInput.name = 'delete_questions';
-                                        deleteInput.value = '1';
-                                        form.appendChild(deleteInput);
-
-                                        // Add selected question IDs
-                                        selectedQuestions.forEach(checkbox => {
-                                            const idInput = document.createElement('input');
-                                            idInput.type = 'hidden';
-                                            idInput.name = 'question_ids[]';
-                                            idInput.value = checkbox.value;
-                                            form.appendChild(idInput);
-                                        });
-
-                                        document.body.appendChild(form);
-                                        form.submit();
-                                    }
                                 });
 
                                 // Initialize counts for questions list
@@ -1465,11 +1455,10 @@ include_once "../../includes/header.php";
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
+<script>    document.addEventListener('DOMContentLoaded', function() {
         // Handle select all questions checkbox
         const selectAllQuestions = document.getElementById('selectAllQuestions');
-        const questionCheckboxes = document.querySelectorAll('.question-checkbox');
+        const questionCheckboxes = document.querySelectorAll('.questions-list-checkbox');
         const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
 
         if (selectAllQuestions) {
@@ -1501,9 +1490,7 @@ include_once "../../includes/header.php";
         function updateDeleteButtonState() {
             const selectedCount = Array.from(questionCheckboxes).filter(cb => cb.checked).length;
             deleteSelectedBtn.disabled = selectedCount === 0;
-        }
-
-        // Handle delete selected button
+        }        // Handle delete selected button
         if (deleteSelectedBtn) {
             deleteSelectedBtn.addEventListener('click', function() {
                 const selectedIds = Array.from(questionCheckboxes)
