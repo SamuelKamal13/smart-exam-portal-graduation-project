@@ -25,6 +25,7 @@ if (session_status() == PHP_SESSION_NONE) {
         <?php echo $extra_css; ?>
     <?php endif; ?>
     <link href="<?php echo $base_url; ?>/assets/css/error-pages.css" rel="stylesheet">
+    <link href="<?php echo $base_url; ?>/assets/css/manage-questions.css" rel="stylesheet">
 </head>
 
 <body>

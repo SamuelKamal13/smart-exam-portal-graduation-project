@@ -1,0 +1,162 @@
+.steps {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    position: relative;
+}
+
+.steps:before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e9ecef;
+    z-index: 1;
+}
+
+.step {
+    position: relative;
+    z-index: 2;
+    background: #fff;
+    width: 22%;
+    text-align: center;
+    padding: 10px;
+}
+
+.step-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    font-size: 18px;
+}
+
+.step.active .step-icon {
+    background: #4e73df;
+    color: #fff;
+}
+
+.step-text h5 {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.step-text p {
+    font-size: 12px;
+    color: #6c757d;
+    margin-bottom: 0;
+}    /* Question Bank Table Styles */
+#questionBankTable,
+#questionsListTable {
+    font-size: 0.9rem;
+}
+
+#questionBankTable thead th,
+#questionsListTable thead th {
+    background-color: #f8f9fc !important;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+    color: #5a5c69;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+#questionBankTable tbody tr,
+#questionsListTable tbody tr {
+    transition: background-color 0.15s ease-in-out;
+}
+
+#questionBankTable tbody tr:hover,
+#questionsListTable tbody tr:hover {
+    background-color: #f8f9fc;
+}
+
+#questionBankTable td,
+#questionsListTable td {
+    vertical-align: middle;
+    padding: 0.75rem 0.5rem;
+}
+
+/* Scrollable container */
+.table-responsive {
+    border-radius: 0.375rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+/* Custom scrollbar for webkit browsers */
+.table-responsive::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}    /* Checkbox styling */
+.question-checkbox,
+.questions-list-checkbox,
+#selectAll,
+#selectAllQuestions {
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+/* Badge styling improvements */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.5rem;
+}
+
+/* Filter controls styling */
+.form-control:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+/* Results info styling */
+#resultsInfo {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+/* Button hover effects */
+#addFromBankBtn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* Tooltip for truncated exam titles */
+[title]:hover {
+    cursor: help;
+}    /* Responsive adjustments */
+@media (max-width: 768px) {
+    #questionBankTable,
+    #questionsListTable {
+        font-size: 0.8rem;
+    }
+    
+    #questionBankTable td,
+    #questionsListTable td {
+        padding: 0.5rem 0.25rem;
+    }
+    
+    .table-responsive {
+        max-height: 300px !important;
+    }
+}
